@@ -1,39 +1,32 @@
 import { useEffect, useState } from "react";
-import { obtenerNoticias } from "./fakeRest";
-import { INoticiasNormalizadas, INoticias } from "./types";
+import { obtenerNoticias, INoticias } from "./fakeRest";
+import { INoticiasNormalizadas } from "./types";
 
-const normalizarNoticias = (noticias: INoticias[]): INoticiasNormalizadas[] => {
-  return noticias.map(n => {
-    const titulo = n.titulo.split(" ")
-      .map((str: string) => str.charAt(0).toUpperCase() + str.slice(1))
-      .join(" ");
-    
-    const minutosTranscurridos = Math.floor(
-      (new Date().getTime() - n.fecha.getTime()) / 60000
-    );
-    
-    return {
-      ...n,
-      titulo,
-      fecha: `Hace ${minutosTranscurridos} minutos`,
-      descripcionCorta: n.descripcion.substring(0, 100)
-    };
-  });
+export const titulo = (titulo: String) => {
+  const convertirTitulo = titulo.split(" ").map((string) => {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+  }).join(" ");
+
+  return convertirTitulo;
 }
 
-
-const useNoticias = (): INoticiasNormalizadas[] => {
-  const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
-
-  useEffect(() => {
-    const obtenerInformacion = async () => {
-      const respuesta = await obtenerNoticias();
-      setNoticias(normalizarNoticias(respuesta));
-    };
-    obtenerInformacion();
-  }, []);
-
-  return noticias;
+export const calcularMinutos = (fecha: Date) => {
+  const ahora = new Date();
+  const minutosTranscurridos = Math.floor(
+      (ahora.getTime() - fecha.getTime()) / 60000
+  );
+  return minutosTranscurridos;
 };
 
-export default useNoticias;
+export const noticiasNormalizadas = (noticias: INoticias[]) => {
+  return noticias.map((n) => ({
+      id: n.id,
+      titulo: titulo(n.titulo),
+      descripcion: n.descripcion,
+      fecha: `Hace ${calcularMinutos(n.fecha)} minutos`,
+      esPremium: n.esPremium,
+      imagen: n.imagen,
+      descripcionCorta: n.descripcion.substring(0, 100),
+  }));
+};
+

@@ -6,9 +6,9 @@ import {
     DescripcionTarjetaNoticia,
     BotonLectura
 } from "./styled";
-import { INoticiaProps } from './types';
+import { INoticia } from "./types";
 
-const Noticia = ({ noticia, setModal }: INoticiaProps) => {
+const Noticia = ({ noticia, setModal }: INoticia) => {
     return (
         <TarjetaNoticia>
             <ImagenTarjetaNoticia src={noticia?.imagen} />

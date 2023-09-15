@@ -1,49 +1,42 @@
 import { useEffect, useState } from "react";
-import useNoticias from "./useNoticias";
-import ModalPremium from "./ModalPremium";
-import ModalNoticia from "./ModalNoticia";
-import Noticia from "./Noticia";
-
-import { 
-    ContenedorNoticias, 
-    TituloNoticias, 
-    ListaNoticias, 
-    // TarjetaNoticia, 
-    // FechaTarjetaNoticia, 
-    // DescripcionTarjetaNoticia, 
-    // ImagenTarjetaNoticia, 
-    // TituloTarjetaNoticia, 
-    // BotonLectura 
+import { obtenerNoticias } from "./fakeRest";
+import {
+  ContenedorNoticias,
+  ListaNoticias,
+  TituloNoticias
 } from "./styled";
-import { INoticiasNormalizadas } from './types';
+import { INoticiasNormalizadas } from "./types";
+import Modal from "./Modal";
+import Noticia from "./Noticia";
+import { noticiasNormalizadas } from "./useNoticias";
+
 
 
 const Noticias = () => {
   const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
   const [modal, setModal] = useState<INoticiasNormalizadas | null>(null);
 
-    const handleCloseModal = () => {
-        setModal(null);
-    }
+  useEffect(() => {
+    const obtenerInformacion = async () => {
+      const respuesta = await obtenerNoticias();
+      const noticiasAPI = noticiasNormalizadas(respuesta);
+      setNoticias(noticiasAPI);
+    };
 
-    return (
-        <ContenedorNoticias>
-            <TituloNoticias>Noticias de los Simpsons</TituloNoticias>
-            <ListaNoticias>
-                {noticias.map(noticia => (
-                    <Noticia key={noticia.id} noticia={noticia} setModal={setModal} />
-                ))}
-            </ListaNoticias>
+    obtenerInformacion();
+  }, []);
 
-            {modal && (
-                modal.esPremium ? (
-                    <ModalPremium onClose={handleCloseModal} />
-                ) : (
-                    <ModalNoticia noticia={modal} onClose={handleCloseModal} />
-                )
-            )}
-        </ContenedorNoticias>
-    );
+  return (
+    <ContenedorNoticias>
+      <TituloNoticias>Noticias de los Simpsons</TituloNoticias>
+      <ListaNoticias>
+        {noticias.map((n) => (
+          <Noticia key={n.id} noticia={n} setModal={() => setModal(n)} />
+        ))}
+        {modal ? (<Modal noticia={modal} setModal={() => setModal(null)}></Modal>) : null}
+      </ListaNoticias>
+    </ContenedorNoticias>
+  );
 };
 
 export default Noticias;
